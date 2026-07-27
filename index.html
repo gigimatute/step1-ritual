@@ -1,0 +1,492 @@
+<!DOCTYPE html>
+<html lang="es">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1, viewport-fit=cover">
+<title>Ritual Step 1</title>
+<meta name="theme-color" content="#0d3b2e">
+<link rel="manifest" href="manifest.json">
+<link rel="apple-touch-icon" href="icon-192.png">
+<meta name="apple-mobile-web-app-capable" content="yes">
+<meta name="apple-mobile-web-app-status-bar-style" content="black-translucent">
+<meta name="apple-mobile-web-app-title" content="Ritual Step 1">
+<style>
+  :root{
+    --pine-900:#0a2e23;
+    --pine-800:#0d3b2e;
+    --pine-600:#155c47;
+    --pine-100:#e2efe9;
+    --cream:#f7f4ec;
+    --coral:#d8663f;
+    --coral-light:#f3e0d6;
+    --ink:#1c2622;
+    --muted:#6b7a74;
+    --line:#dde3df;
+  }
+  *{box-sizing:border-box;}
+  body{
+    margin:0;
+    font-family:-apple-system,BlinkMacSystemFont,'Segoe UI',Roboto,sans-serif;
+    background:var(--cream);
+    color:var(--ink);
+    padding-bottom:3rem;
+  }
+  header{
+    background:var(--pine-800);
+    color:var(--cream);
+    padding:2.25rem 1.5rem 1.75rem;
+    border-radius:0 0 20px 20px;
+  }
+  header .eyebrow{
+    font-size:12px;
+    letter-spacing:0.06em;
+    text-transform:uppercase;
+    color:#9dc4b5;
+    margin:0 0 6px;
+  }
+  header h1{
+    font-size:22px;
+    font-weight:600;
+    margin:0 0 2px;
+  }
+  header p.sub{
+    font-size:13px;
+    color:#b8d6c8;
+    margin:0;
+  }
+  .streak-row{
+    display:flex;
+    align-items:baseline;
+    gap:10px;
+    margin-top:1.1rem;
+  }
+  .streak-num{
+    font-size:40px;
+    font-weight:700;
+    line-height:1;
+  }
+  .streak-label{
+    font-size:13px;
+    color:#b8d6c8;
+  }
+  main{
+    max-width:520px;
+    margin:0 auto;
+    padding:1.25rem 1.25rem 0;
+  }
+  section{margin-bottom:1.75rem;}
+  h2{
+    font-size:14px;
+    font-weight:600;
+    letter-spacing:0.02em;
+    color:var(--muted);
+    text-transform:uppercase;
+    margin:0 0 0.75rem;
+  }
+  .item{
+    display:flex;
+    align-items:center;
+    gap:12px;
+    background:#fff;
+    border:1px solid var(--line);
+    border-radius:12px;
+    padding:0.85rem 1rem;
+    margin-bottom:8px;
+    cursor:pointer;
+    transition:background .15s;
+  }
+  .item.done{background:var(--pine-100); border-color:#c6ddd2;}
+  .dot{
+    width:22px;height:22px;border-radius:50%;
+    border:1.5px solid #c7cfca;
+    flex-shrink:0;
+    display:flex;align-items:center;justify-content:center;
+  }
+  .item.done .dot{background:var(--pine-600); border-color:var(--pine-600);}
+  .dot svg{width:12px;height:12px;display:none;}
+  .item.done .dot svg{display:block;}
+  .item-title{font-size:14.5px;font-weight:600;margin:0;}
+  .item.done .item-title{color:var(--muted); text-decoration:line-through;}
+  .item-sub{font-size:12px;color:var(--muted);margin:1px 0 0;}
+  .progress-bar{
+    height:6px;background:var(--line);border-radius:4px;overflow:hidden;margin-top:4px;
+  }
+  .progress-fill{height:100%;background:var(--pine-600);transition:width .2s;}
+  .progress-text{font-size:12px;color:var(--muted); margin-top:6px;}
+  .day-complete{
+    display:none;
+    margin-top:10px;
+    background:var(--coral-light);
+    color:#8a3d20;
+    font-size:13px;
+    font-weight:600;
+    padding:10px 14px;
+    border-radius:10px;
+    text-align:center;
+  }
+  .grid-wrap{
+    background:#fff;
+    border:1px solid var(--line);
+    border-radius:14px;
+    padding:1rem;
+  }
+  .pill-grid{
+    display:grid;
+    grid-template-columns:repeat(10, 1fr);
+    gap:6px;
+  }
+  .pill{
+    aspect-ratio:1/1;
+    border-radius:5px;
+    background:#eef1ef;
+    border:1px solid var(--line);
+  }
+  .pill.filled{background:var(--pine-600); border-color:var(--pine-600);}
+  .pill.today{outline:2px solid var(--coral); outline-offset:1px;}
+  .grid-legend{
+    display:flex;justify-content:space-between;font-size:11px;color:var(--muted);margin-top:10px;
+  }
+  button.reset{
+    width:100%;
+    background:none;
+    border:1px solid var(--line);
+    color:var(--muted);
+    font-size:13px;
+    padding:10px;
+    border-radius:10px;
+    margin-top:0.5rem;
+  }
+  .install-hint{
+    font-size:12px;
+    color:var(--muted);
+    text-align:center;
+    margin-top:1.5rem;
+    line-height:1.6;
+  }
+</style>
+</head>
+<body>
+
+<header>
+  <p class="eyebrow" id="day-count-label">USMLE Step 1 &middot; dia 1 de 90</p>
+  <h1>Ritual diario</h1>
+  <p class="sub" id="date-label"></p>
+  <div class="streak-row">
+    <span class="streak-num" id="streak-num">0</span>
+    <span class="streak-label">dias seguidos</span>
+  </div>
+</header>
+
+<div id="urgent-banner" style="display:none; max-width:520px; margin:0.85rem auto 0; background:#c0392b; color:#fff; font-size:13.5px; font-weight:600; padding:0.85rem 1.25rem; text-align:center;"></div>
+
+<main>
+  <section>
+    <h2>Hoy</h2>
+    <div id="items"></div>
+    <div class="progress-bar"><div class="progress-fill" id="progress-fill"></div></div>
+    <p class="progress-text" id="progress-text">0 de 6</p>
+    <div class="day-complete" id="day-complete">Dia completo. Manana suma otro.</div>
+    <button class="reset" id="reset-btn">Reiniciar el dia de hoy</button>
+  </section>
+
+  <section>
+    <h2>Los 90 dias</h2>
+    <div class="grid-wrap">
+      <div class="pill-grid" id="pill-grid"></div>
+      <div class="grid-legend">
+        <span id="days-done-label">0 dias completos</span>
+        <span id="days-left-label">90 dias en total</span>
+      </div>
+    </div>
+  </section>
+
+  <section>
+    <h2>Actividad fisica</h2>
+    <div class="grid-wrap">
+      <div class="item" id="activity-toggle" style="margin-bottom:10px;">
+        <div class="dot"><svg viewBox="0 0 24 24" fill="none" stroke="white" stroke-width="3" stroke-linecap="round"><path d="M4 12l5 5L20 7"/></svg></div>
+        <div>
+          <p class="item-title">Me movi hoy</p>
+          <p class="item-sub">caminar, gym, yoga, lo que sea &mdash; cuenta cualquier cosa</p>
+        </div>
+      </div>
+      <div style="display:flex; align-items:center; gap:10px;">
+        <label style="font-size:13px; color:var(--muted);">Minutos</label>
+        <input type="number" id="activity-minutes" min="0" step="5" placeholder="20" style="width:70px; font-size:14px; padding:6px 8px; border:1px solid var(--line); border-radius:8px;">
+        <span style="font-size:12px; color:var(--muted); margin-left:auto;" id="activity-week-label">0 min esta semana</span>
+      </div>
+    </div>
+  </section>
+
+  <section>
+    <h2>Alerta diaria</h2>
+    <div class="grid-wrap" style="display:flex; align-items:center; gap:12px; flex-wrap:wrap;">
+      <div style="flex:1; min-width:160px;">
+        <p style="font-size:13px; margin:0 0 4px; font-weight:600;">Avisame si no he terminado a las</p>
+        <input type="time" id="reminder-time" value="20:00" style="font-size:14px; padding:6px 8px; border:1px solid var(--line); border-radius:8px;">
+      </div>
+      <button id="notif-btn" style="background:var(--pine-600); color:#fff; border:none; padding:10px 16px; border-radius:10px; font-size:13px; font-weight:600;">Activar notificacion</button>
+    </div>
+    <p style="font-size:11.5px; color:var(--muted); margin-top:8px; line-height:1.5;">
+      La notificacion del navegador solo llega si la app quedo abierta o en segundo plano. Como respaldo, pon tambien una alarma nativa en tu telefono a esta misma hora.
+    </p>
+  </section>
+
+  <p class="install-hint">
+    En el telefono: menu del navegador &rarr; "Agregar a pantalla de inicio".<br>
+    En la computadora: icono de instalar en la barra de direcciones.
+  </p>
+</main>
+
+<script>
+const steps = [
+  {id:"cafe", title:"Cafe + revisar error log de ayer", sub:"antes de tocar preguntas nuevas"},
+  {id:"porque", title:"Leer tu por que concreto", sub:"la primera consulta con licencia en Florida"},
+  {id:"bloque1", title:"Bloque 1: 40 preguntas UWorld", sub:"tutor mode, sistema del dia"},
+  {id:"bloque2", title:"Bloque 2: 40 preguntas UWorld", sub:"tutor mode, sistema del dia"},
+  {id:"errorlog", title:"Actualizar error log", sub:"que aprendiste, que fallo"},
+  {id:"cierre", title:"Micro-cierre: una linea de progreso", sub:"deja lista la sesion de manana"}
+];
+
+const START_KEY = "ritual_start_date";
+const LOG_KEY = "ritual_completed_days"; // {"2026-07-27": true, ...}
+const TODAY_STATE_KEY = "ritual_today_state"; // {date:"2026-07-27", items:{...}}
+
+function todayStr(){
+  return new Date().toISOString().slice(0,10);
+}
+
+function getStartDate(){
+  let s = localStorage.getItem(START_KEY);
+  if(!s){
+    s = todayStr();
+    localStorage.setItem(START_KEY, s);
+  }
+  return s;
+}
+
+function getLog(){
+  try{ return JSON.parse(localStorage.getItem(LOG_KEY) || "{}"); }catch(e){ return {}; }
+}
+function saveLog(log){ localStorage.setItem(LOG_KEY, JSON.stringify(log)); }
+
+function getTodayState(){
+  try{
+    const raw = JSON.parse(localStorage.getItem(TODAY_STATE_KEY) || "null");
+    if(raw && raw.date === todayStr()) return raw.items;
+  }catch(e){}
+  return {};
+}
+function saveTodayState(items){
+  localStorage.setItem(TODAY_STATE_KEY, JSON.stringify({date: todayStr(), items}));
+}
+
+function computeStreak(log){
+  let streak = 0;
+  let d = new Date();
+  // if today not done yet, start counting from yesterday backwards
+  if(!log[todayStr()]) d.setDate(d.getDate()-1);
+  while(true){
+    const key = d.toISOString().slice(0,10);
+    if(log[key]){ streak++; d.setDate(d.getDate()-1); }
+    else break;
+  }
+  return streak;
+}
+
+let itemState = getTodayState();
+
+function render(){
+  const container = document.getElementById("items");
+  container.innerHTML = "";
+  steps.forEach(s=>{
+    const done = !!itemState[s.id];
+    const row = document.createElement("div");
+    row.className = "item" + (done ? " done" : "");
+    row.innerHTML = `
+      <div class="dot"><svg viewBox="0 0 24 24" fill="none" stroke="white" stroke-width="3" stroke-linecap="round"><path d="M4 12l5 5L20 7"/></svg></div>
+      <div>
+        <p class="item-title">${s.title}</p>
+        <p class="item-sub">${s.sub}</p>
+      </div>`;
+    row.onclick = ()=> toggle(s.id);
+    container.appendChild(row);
+  });
+
+  const doneCount = steps.filter(s=>itemState[s.id]).length;
+  document.getElementById("progress-fill").style.width = (doneCount/steps.length*100)+"%";
+  document.getElementById("progress-text").textContent = doneCount + " de " + steps.length;
+  document.getElementById("day-complete").style.display = doneCount===steps.length ? "block" : "none";
+
+  const log = getLog();
+  document.getElementById("streak-num").textContent = computeStreak(log);
+
+  renderGrid(log);
+
+  const fullDate = new Date().toLocaleDateString("es-ES",{weekday:"long", day:"numeric", month:"long", year:"numeric"});
+  document.getElementById("date-label").textContent = fullDate.charAt(0).toUpperCase()+fullDate.slice(1);
+
+  const start = new Date(getStartDate());
+  const diffDays = Math.floor((new Date(todayStr()) - new Date(getStartDate())) / 86400000) + 1;
+  const dayNum = Math.min(Math.max(diffDays,1), 90);
+  document.getElementById("day-count-label").textContent = "USMLE Step 1 · dia " + dayNum + " de 90";
+
+  updateUrgentBanner(doneCount, steps.length);
+}
+
+function updateUrgentBanner(doneCount, total){
+  const banner = document.getElementById("urgent-banner");
+  const remindTime = localStorage.getItem("ritual_remind_time") || "20:00";
+  const [h,m] = remindTime.split(":").map(Number);
+  const now = new Date();
+  const pastTime = now.getHours() > h || (now.getHours()===h && now.getMinutes()>=m);
+  if(doneCount < total && pastTime){
+    const left = total - doneCount;
+    banner.style.display = "block";
+    banner.textContent = "No puedes fallar hoy. Te faltan " + left + " de " + total + " pasos.";
+  } else {
+    banner.style.display = "none";
+  }
+}
+
+function scheduleTodayNotification(){
+  if(!("Notification" in window) || Notification.permission !== "granted") return;
+  const remindTime = localStorage.getItem("ritual_remind_time") || "20:00";
+  const [h,m] = remindTime.split(":").map(Number);
+  const target = new Date();
+  target.setHours(h, m, 0, 0);
+  const msUntil = target - new Date();
+  if(msUntil <= 0) return;
+  clearTimeout(window._ritualNotifTimer);
+  window._ritualNotifTimer = setTimeout(()=>{
+    const log = getLog();
+    if(!log[todayStr()]){
+      new Notification("Ritual Step 1", {
+        body: "Todavia no completas el ritual de hoy. No puedes fallar.",
+        icon: "icon-192.png"
+      });
+    }
+  }, msUntil);
+}
+
+const reminderInput = document.getElementById("reminder-time");
+reminderInput.value = localStorage.getItem("ritual_remind_time") || "20:00";
+reminderInput.onchange = ()=>{
+  localStorage.setItem("ritual_remind_time", reminderInput.value);
+  render();
+  scheduleTodayNotification();
+};
+
+document.getElementById("notif-btn").onclick = ()=>{
+  if(!("Notification" in window)){
+    alert("Este navegador no soporta notificaciones.");
+    return;
+  }
+  Notification.requestPermission().then(perm=>{
+    if(perm === "granted"){
+      scheduleTodayNotification();
+      document.getElementById("notif-btn").textContent = "Notificacion activada";
+    }
+  });
+};
+
+const ACTIVITY_KEY = "ritual_activity_log"; // {"2026-07-27": {done:true, minutes:20}, ...}
+
+function getActivityLog(){
+  try{ return JSON.parse(localStorage.getItem(ACTIVITY_KEY) || "{}"); }catch(e){ return {}; }
+}
+function saveActivityLog(log){ localStorage.setItem(ACTIVITY_KEY, JSON.stringify(log)); }
+
+function renderActivity(){
+  const log = getActivityLog();
+  const todayEntry = log[todayStr()] || {done:false, minutes:0};
+
+  const toggle = document.getElementById("activity-toggle");
+  toggle.classList.toggle("done", !!todayEntry.done);
+
+  const minutesInput = document.getElementById("activity-minutes");
+  minutesInput.value = todayEntry.minutes || "";
+
+  let weekTotal = 0;
+  const now = new Date();
+  for(let i=0;i<7;i++){
+    const d = new Date(now);
+    d.setDate(d.getDate()-i);
+    const key = d.toISOString().slice(0,10);
+    if(log[key]) weekTotal += (log[key].minutes || 0);
+  }
+  document.getElementById("activity-week-label").textContent = weekTotal + " min esta semana";
+}
+
+document.getElementById("activity-toggle").onclick = ()=>{
+  const log = getActivityLog();
+  const entry = log[todayStr()] || {done:false, minutes:0};
+  entry.done = !entry.done;
+  log[todayStr()] = entry;
+  saveActivityLog(log);
+  renderActivity();
+};
+
+document.getElementById("activity-minutes").onchange = (e)=>{
+  const log = getActivityLog();
+  const entry = log[todayStr()] || {done:false, minutes:0};
+  entry.minutes = parseInt(e.target.value) || 0;
+  if(entry.minutes > 0) entry.done = true;
+  log[todayStr()] = entry;
+  saveActivityLog(log);
+  renderActivity();
+};
+
+renderActivity();
+
+function toggle(id){
+  itemState[id] = !itemState[id];
+  saveTodayState(itemState);
+
+  const allDone = steps.every(s=>itemState[s.id]);
+  const log = getLog();
+  if(allDone){
+    log[todayStr()] = true;
+  } else {
+    delete log[todayStr()];
+  }
+  saveLog(log);
+  render();
+}
+
+function renderGrid(log){
+  const start = new Date(getStartDate());
+  const grid = document.getElementById("pill-grid");
+  grid.innerHTML = "";
+  const today = todayStr();
+  let doneCount = 0;
+  for(let i=0;i<90;i++){
+    const d = new Date(start);
+    d.setDate(d.getDate()+i);
+    const key = d.toISOString().slice(0,10);
+    const filled = !!log[key];
+    if(filled) doneCount++;
+    const cell = document.createElement("div");
+    cell.className = "pill" + (filled ? " filled":"") + (key===today ? " today":"");
+    grid.appendChild(cell);
+  }
+  document.getElementById("days-done-label").textContent = doneCount + " dias completos";
+}
+
+document.getElementById("reset-btn").onclick = ()=>{
+  itemState = {};
+  saveTodayState(itemState);
+  const log = getLog();
+  delete log[todayStr()];
+  saveLog(log);
+  render();
+};
+
+render();
+
+if("serviceWorker" in navigator){
+  navigator.serviceWorker.register("sw.js").catch(()=>{});
+}
+</script>
+</body>
+</html>
